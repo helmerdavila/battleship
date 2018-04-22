@@ -48,24 +48,36 @@ export default class Board extends React.Component {
 
   getEmptyCells = (board = [], size) => {
     let cells;
-    let emptyColumnsCount;
-    let randomRow = 0;
+    let partsCount;
     do {
-      emptyColumnsCount = 0;
+      partsCount = 0;
       cells = [];
-      randomRow = randomItem(this.state.rows);
-      let columnRangeBegin = randomNumber(1, this.state.columns.length);
-      const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
+      const isVertical = faker.random.boolean();
 
-      for (let column of randomColumns) {
-        const theCell = this.getCell(board, randomRow, column);
-        cells.push(theCell);
+      if (isVertical) {
+        let randomColumn = randomItem(this.state.columns);
+        let rowRangeBegin = randomNumber(1, this.state.rows.length);
+        const randomRows = this.state.rows.slice(rowRangeBegin, rowRangeBegin + size);
+
+        for (let row of randomRows) {
+          const theCell = this.getCell(board, row, randomColumn);
+          cells.push(theCell);
+        }
+      } else {
+        let randomRow = randomItem(this.state.rows);
+        let columnRangeBegin = randomNumber(1, this.state.columns.length);
+        const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
+
+        for (let column of randomColumns) {
+          const theCell = this.getCell(board, randomRow, column);
+          cells.push(theCell);
+        }
       }
 
       for (let cell of cells) {
-        emptyColumnsCount = emptyColumnsCount + (cell["ship"] === null ? 1 : 0);
+        partsCount = partsCount + (cell["ship"] === null ? 1 : 0);
       }
-    } while (emptyColumnsCount !== size);
+    } while (partsCount !== size);
 
     return cells;
   };
