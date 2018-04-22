@@ -4,6 +4,7 @@ import * as faker from "faker";
 import { randomItem, randomNumber } from "../helpers";
 
 export default class Board extends React.Component {
+  board = {};
   state = {
     rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
     columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -14,7 +15,7 @@ export default class Board extends React.Component {
   initBoard = () => {
     const rows = this.state.rows;
     const columns = this.state.columns;
-    let board = {};
+    let board = this.board;
 
     for (let row of rows) {
       board[row] = new Array(columns.length);
@@ -36,17 +37,17 @@ export default class Board extends React.Component {
      * Ships: 3, Size: 2
      * Ships: 4, Size: 1
      */
-    board = this.createShips(board, 4, 1, "#277C6B");
-    board = this.createShips(board, 3, 2, "#7C2738");
-    board = this.createShips(board, 2, 3, "#B8962E");
-    board = this.createShips(board, 1, 4, "#B8512E");
+    this.createShips(4, 1, "#277C6B");
+    this.createShips(3, 2, "#7C2738");
+    this.createShips(2, 3, "#B8962E");
+    this.createShips(1, 4, "#B8512E");
 
     return this.setState({ board: board });
   };
 
-  getCell = (board, row, column) => board[row][column];
+  getCell = (row, column) => this.board[row][column];
 
-  getEmptyCells = (board = [], size) => {
+  getEmptyCells = (size) => {
     let cells;
     let partsCount;
     do {
@@ -60,7 +61,7 @@ export default class Board extends React.Component {
         const randomRows = this.state.rows.slice(rowRangeBegin, rowRangeBegin + size);
 
         for (let row of randomRows) {
-          const theCell = this.getCell(board, row, randomColumn);
+          const theCell = this.getCell(row, randomColumn);
           cells.push(theCell);
         }
       } else {
@@ -69,7 +70,7 @@ export default class Board extends React.Component {
         const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
 
         for (let column of randomColumns) {
-          const theCell = this.getCell(board, randomRow, column);
+          const theCell = this.getCell(randomRow, column);
           cells.push(theCell);
         }
       }
@@ -82,19 +83,17 @@ export default class Board extends React.Component {
     return cells;
   };
 
-  setShipPartInBoard = (board, ship, row, column) => {
-    board[row][column]["ship"] = { ...ship };
-
-    return board;
+  setShipPartInBoard = (ship, row, column) => {
+    this.board[row][column]["ship"] = { ...ship };
   };
 
-  createShips = (board = [], quantity = 1, size = 1, color) => {
+  createShips = (quantity = 1, size = 1, color) => {
     const ships = [];
 
     for (let temp = 1; temp <= quantity; temp++) {
       const ship = [];
       const shipName = `${faker.random.word()}-${size}`;
-      const emptyCells = this.getEmptyCells(board, size);
+      const emptyCells = this.getEmptyCells(size);
 
       emptyCells.map(cell => {
         const part = {
@@ -107,13 +106,11 @@ export default class Board extends React.Component {
 
         ship.push(part);
 
-        board = this.setShipPartInBoard(board, part, cell["row"], cell["column"]);
+        return this.setShipPartInBoard(part, cell["row"], cell["column"]);
       });
 
       ships[shipName] = ship;
     }
-
-    return board;
   };
 
   initGame = () => {
