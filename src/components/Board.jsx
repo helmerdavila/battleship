@@ -1,7 +1,7 @@
 import React from "react";
 import "./board.css";
 import * as faker from "faker";
-import { randomItem } from "../helpers";
+import { randomItem, randomNumber } from "../helpers";
 
 export default class Board extends React.Component {
   state = {
@@ -12,12 +12,13 @@ export default class Board extends React.Component {
   };
 
   initBoard = () => {
-    let board = this.state.board;
     const rows = this.state.rows;
     const columns = this.state.columns;
+    let board = {};
 
     for (let row of rows) {
       board[row] = new Array(columns.length);
+
       for (let column of columns) {
         board[row][column] = {
           row,
@@ -28,85 +29,83 @@ export default class Board extends React.Component {
       }
     }
 
-    console.log(board);
-    return this.setState({ board: { ...board } });
+    /**
+     * Create default ships
+     * Ships: 1, Size: 4
+     * Ships: 2, Size: 3
+     * Ships: 3, Size: 2
+     * Ships: 4, Size: 1
+     */
+    board = this.createShips(board, 4, 1, "#277C6B");
+    board = this.createShips(board, 3, 2, "#7C2738");
+    board = this.createShips(board, 2, 3, "#B8962E");
+    board = this.createShips(board, 1, 4, "#B8512E");
+
+    return this.setState({ board: board });
   };
 
-  getCell = (row, column) => {
-    return this.state.board[row][column];
-  };
+  getCell = (board, row, column) => board[row][column];
 
-  getEmptyCell = () => {
-    let cell = {};
+  getEmptyCells = (board = [], size) => {
+    let cells;
+    let emptyColumnsCount;
     let randomRow = 0;
-    let randomColumn = 0;
     do {
+      emptyColumnsCount = 0;
+      cells = [];
       randomRow = randomItem(this.state.rows);
-      randomColumn = randomItem(this.state.columns);
-      cell = this.getCell(randomRow, randomColumn);
-    } while (cell["ship"] !== null);
+      let columnRangeBegin = randomNumber(1, this.state.columns.length);
+      const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
 
-    return cell;
+      for (let column of randomColumns) {
+        const theCell = this.getCell(board, randomRow, column);
+        cells.push(theCell);
+      }
+
+      for (let cell of cells) {
+        emptyColumnsCount = emptyColumnsCount + (cell["ship"] === null ? 1 : 0);
+      }
+    } while (emptyColumnsCount !== size);
+
+    return cells;
   };
 
-  setShipPartInBoard = (ship, row, column) => {
-    const board = this.state.board;
+  setShipPartInBoard = (board, ship, row, column) => {
     board[row][column]["ship"] = { ...ship };
 
-    return this.setState({ board });
+    return board;
   };
 
-  createShips = async (quantity = 1, size = 1, color) => {
+  createShips = (board = [], quantity = 1, size = 1, color) => {
     const ships = [];
+
     for (let temp = 1; temp <= quantity; temp++) {
       const ship = [];
       const shipName = `${faker.random.word()}-${size}`;
-      for (let part = 1; part <= size; part++) {
-        const emptyCell = this.getEmptyCell();
+      const emptyCells = this.getEmptyCells(board, size);
+
+      emptyCells.map(cell => {
         const part = {
           shipName,
-          row: emptyCell["row"],
-          column: emptyCell["column"],
+          row: cell["row"],
+          column: cell["column"],
           touched: false,
           color,
         };
 
         ship.push(part);
 
-        await this.setShipPartInBoard(
-          part,
-          emptyCell["row"],
-          emptyCell["column"]
-        );
-      }
+        board = this.setShipPartInBoard(board, part, cell["row"], cell["column"]);
+      });
+
       ships[shipName] = ship;
     }
 
-    return ships;
+    return board;
   };
 
-  /**
-   * Create default ships
-   * Ships: 1, Size: 4
-   * Ships: 2, Size: 3
-   * Ships: 3, Size: 2
-   * Ships: 4, Size: 1
-   */
-  initShip = async () => {
-    //const ships = this.state.ships;
-    const sizeOneShips = await this.createShips(4, 1, "#277C6B");
-
-    console.log(sizeOneShips);
-
-    // Create the size 1 ship for know if the site is filled and paint in the table
-    // Create the size >= 1 for know if the side cell is filled
-
-    //this.setState({ ships: {...ships} });
-  };
-
-  initGame = async () => {
-    await this.initBoard();
-    await this.initShip();
+  initGame = () => {
+    this.initBoard();
   };
 
   componentDidMount() {
@@ -118,7 +117,15 @@ export default class Board extends React.Component {
     let table = [];
     for (let indexRow in board) {
       const columns = [];
+      if (!board.hasOwnProperty(indexRow)) {
+        continue;
+      }
+
       for (let indexColumn in board[indexRow]) {
+        if (!board[indexRow].hasOwnProperty(indexColumn)) {
+          continue;
+        }
+
         const cell = board[indexRow][indexColumn];
         const backgroundColorCell = cell['ship'] !== null ? cell['ship']['color'] : null;
         columns.push(
