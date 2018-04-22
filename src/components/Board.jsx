@@ -34,7 +34,7 @@ export default class Board extends React.Component {
           row,
           column,
           ship: null,
-          touched: false
+          landed: null,
         };
       }
     }
@@ -118,7 +118,6 @@ export default class Board extends React.Component {
           shipName,
           row: cell["row"],
           column: cell["column"],
-          touched: false,
           color,
         };
 
@@ -144,6 +143,14 @@ export default class Board extends React.Component {
     this.setState({selectedDifficulty: level, currentTurns: turns, showTurnModal: false});
   };
 
+  handleChooseCell = (row, column) => {
+    const board = this.state.board;
+    const cell = board[row][column];
+    cell['landed'] = cell['ship'] !== null;
+    board[row][column] = {...cell};
+    this.setState({ board });
+  };
+
   render() {
     const board = this.state.board;
     let table = [];
@@ -159,9 +166,18 @@ export default class Board extends React.Component {
         }
 
         const cell = board[indexRow][indexColumn];
-        const backgroundColorCell = cell['ship'] !== null ? cell['ship']['color'] : null;
+        let cellClass = 'the-column';
+
+        if (cell['landed']) {
+          cellClass = 'the-column ship-touched';
+        } else if (cell['landed'] === false) {
+          cellClass = 'the-column ship-untouched';
+        }
+
         columns.push(
-          <div key={`${indexRow}${indexColumn}`} className="the-column" style={{ backgroundColor: backgroundColorCell }}>
+          <div key={`${indexRow}${indexColumn}`}
+               onClick={() => this.handleChooseCell(indexRow, indexColumn)}
+               className={cellClass}>
             {`${indexRow}${indexColumn}`}
           </div>
         );

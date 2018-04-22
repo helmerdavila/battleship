@@ -1,3 +1,5 @@
+@import "../../scss/variables";
+
 .the-table {
   margin-right: auto;
   margin-left: auto;
@@ -6,12 +8,23 @@
     display: flex;
 
     .the-column {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 50px;
       height: 50px;
       background-color: white;
       color: black;
       border: 1px solid black;
       cursor: pointer;
+
+      &.ship-touched {
+        background-color: $green;
+      }
+
+      &.ship-untouched {
+        background-color: $red;
+      }
     }
   }
 }
