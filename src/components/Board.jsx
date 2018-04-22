@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Fragment} from "react";
 import "./board.css";
 import * as faker from "faker";
 import { randomItem, randomNumber } from "../helpers";
@@ -9,7 +9,16 @@ export default class Board extends React.Component {
     rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
     columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     board: {},
-    ships: {}
+    ships: {},
+    // turns
+    currentTurns: 0,
+    difficulty: {
+      easy: 9999999,
+      medium: 100,
+      hard: 50,
+    },
+    selectedDifficulty: null,
+    showTurnModal: true,
   };
 
   initBoard = () => {
@@ -37,7 +46,7 @@ export default class Board extends React.Component {
      * Ships: 3, Size: 2
      * Ships: 4, Size: 1
      */
-    this.createShips(4, 1, "#277C6B");
+    this.createShips(4, 1, "#2427CC");
     this.createShips(3, 2, "#7C2738");
     this.createShips(2, 3, "#B8962E");
     this.createShips(1, 4, "#B8512E");
@@ -130,6 +139,11 @@ export default class Board extends React.Component {
     this.initGame();
   }
 
+  handleChooseDifficulty = (level) => {
+    const turns = this.state.difficulty[level];
+    this.setState({selectedDifficulty: level, currentTurns: turns, showTurnModal: false});
+  };
+
   render() {
     const board = this.state.board;
     let table = [];
@@ -160,11 +174,51 @@ export default class Board extends React.Component {
     }
 
     return (
-      <section className="hero is-info is-fullheight">
-        <div className="hero-body">
-          <div className="the-table">{table}</div>
+      <Fragment>
+        <div className={`modal ${this.state.showTurnModal ? 'is-active' : null}`}>
+          <div className="modal-background"/>
+          <div className="modal-card">
+            <div className="modal-card-head">
+              <p className="modal-card-title">Choose difficulty</p>
+            </div>
+            <div className="modal-card-body">
+              <div className="field">
+                <div className="control">
+                  <label className="checkbox">
+                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("easy")} checked={this.state.selectedDifficulty === "easy"}/> Easy
+                  </label>
+                </div>
+              </div>
+              <div className="field">
+                <div className="control">
+                  <label className="checkbox">
+                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("medium")} checked={this.state.selectedDifficulty === "medium"}/> Medium
+                  </label>
+                </div>
+              </div>
+              <div className="field">
+                <div className="control">
+                  <label className="checkbox">
+                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("hard")} checked={this.state.selectedDifficulty === "hard"}/> Hard
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+        <section className="hero is-info is-fullheight">
+          <div className="hero-body">
+            <div className="the-table">{table}</div>
+          </div>
+          <div className="hero-foot">
+            <div className="tabs is-fullwidth">
+              <ul>
+                <li><a>Turns: {this.state.currentTurns}</a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </Fragment>
     );
   }
 }
