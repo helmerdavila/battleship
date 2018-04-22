@@ -47,33 +47,42 @@ export default class Board extends React.Component {
 
   getCell = (row, column) => this.board[row][column];
 
+  generateVerticalShip = (size) => {
+    let cells = [];
+    let randomColumn = randomItem(this.state.columns);
+    let rowRangeBegin = randomNumber(1, this.state.rows.length);
+    const randomRows = this.state.rows.slice(rowRangeBegin, rowRangeBegin + size);
+
+    for (let row of randomRows) {
+      const theCell = this.getCell(row, randomColumn);
+      cells.push(theCell);
+    }
+
+    return cells;
+  };
+
+  generateHorizontalShip = (size) => {
+    let cells = [];
+    let randomRow = randomItem(this.state.rows);
+    let columnRangeBegin = randomNumber(1, this.state.columns.length);
+    const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
+
+    for (let column of randomColumns) {
+      const theCell = this.getCell(randomRow, column);
+      cells.push(theCell);
+    }
+
+    return cells;
+  };
+
   getEmptyCells = (size) => {
     let cells;
     let partsCount;
     do {
       partsCount = 0;
-      cells = [];
       const isVertical = faker.random.boolean();
 
-      if (isVertical) {
-        let randomColumn = randomItem(this.state.columns);
-        let rowRangeBegin = randomNumber(1, this.state.rows.length);
-        const randomRows = this.state.rows.slice(rowRangeBegin, rowRangeBegin + size);
-
-        for (let row of randomRows) {
-          const theCell = this.getCell(row, randomColumn);
-          cells.push(theCell);
-        }
-      } else {
-        let randomRow = randomItem(this.state.rows);
-        let columnRangeBegin = randomNumber(1, this.state.columns.length);
-        const randomColumns = this.state.columns.slice(columnRangeBegin, columnRangeBegin + size);
-
-        for (let column of randomColumns) {
-          const theCell = this.getCell(randomRow, column);
-          cells.push(theCell);
-        }
-      }
+      cells = isVertical ? this.generateVerticalShip(size) : this.generateHorizontalShip(size);
 
       for (let cell of cells) {
         partsCount = partsCount + (cell["ship"] === null ? 1 : 0);
