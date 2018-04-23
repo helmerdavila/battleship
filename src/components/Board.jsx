@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import "./board.css";
 import * as faker from "faker";
 import { randomItem, randomNumber } from "../helpers";
+import Modal from "./Modal";
 
 export default class Board extends React.Component {
   board = {};
@@ -225,49 +226,28 @@ export default class Board extends React.Component {
 
     return (
       <Fragment>
-        <div className={`modal ${this.state.showTurnModal ? 'is-active' : null}`}>
-          <div className="modal-background"/>
-          <div className="modal-card">
-            <div className="modal-card-head">
-              <p className="modal-card-title">Choose difficulty</p>
-            </div>
-            <div className="modal-card-body">
-              <div className="field">
-                <div className="control">
-                  <label className="checkbox">
-                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("easy")} checked={this.state.selectedDifficulty === "easy"}/> Easy
-                  </label>
+        <Modal showModal={this.state.showTurnModal} difficulty={this.state.selectedDifficulty} changeDifficulty={this.handleChooseDifficulty}/>
+        <div className="columns is-gapless">
+          <div className="column is-one-third">
+            <section className="hero is-dark is-fullheight">
+              <h1>lol</h1>
+            </section>
+          </div>
+          <div className="column">
+            <section className="hero is-info is-fullheight">
+              <div className="hero-body">
+                <div className="the-table">{table}</div>
+              </div>
+              <div className="hero-foot">
+                <div className="tabs is-fullwidth">
+                  <ul>
+                    <li><a>Turns: {this.state.currentTurns}</a></li>
+                  </ul>
                 </div>
               </div>
-              <div className="field">
-                <div className="control">
-                  <label className="checkbox">
-                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("medium")} checked={this.state.selectedDifficulty === "medium"}/> Medium
-                  </label>
-                </div>
-              </div>
-              <div className="field">
-                <div className="control">
-                  <label className="checkbox">
-                    <input type="checkbox" onClick={() => this.handleChooseDifficulty("hard")} checked={this.state.selectedDifficulty === "hard"}/> Hard
-                  </label>
-                </div>
-              </div>
-            </div>
+            </section>
           </div>
         </div>
-        <section className="hero is-info is-fullheight">
-          <div className="hero-body">
-            <div className="the-table">{table}</div>
-          </div>
-          <div className="hero-foot">
-            <div className="tabs is-fullwidth">
-              <ul>
-                <li><a>Turns: {this.state.currentTurns}</a></li>
-              </ul>
-            </div>
-          </div>
-        </section>
       </Fragment>
     );
   }
