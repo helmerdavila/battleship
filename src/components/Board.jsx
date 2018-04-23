@@ -183,14 +183,14 @@ export default class Board extends React.Component {
           });
         return ship;
       });
-      // Check if the ship is shunk
+      // Check if the ship is sunk
       stateShips.map(ship => {
         const touchedParts = ship['parts'].filter(part => part['touched']);
         if (touchedParts.length === ship['parts'].length) {
           ship['sunk'] = true;
           ship['parts'].forEach(part => {
             const cellOfPart = board[part['row']][part['column']];
-            cellOfPart['cssClass'] = 'the-column ship-shunked';
+            cellOfPart['cssClass'] = 'the-column ship-sunked';
           });
         }
         return ship;
@@ -251,7 +251,7 @@ export default class Board extends React.Component {
     const ships = this.state.ships.map(ship => (
       <div key={ship['name']} className="panel-block">
         <span className="is">{ship['name']}</span>
-        <span className={`tag ${ship['sunk'] ? 'is-danger' : 'is-success'}`}>{ship['sunk'] ? 'Shunk' : 'Active'}</span>
+        <span className={`tag ${ship['sunk'] ? 'is-danger' : 'is-success'}`}>{ship['sunk'] ? 'Sunk' : 'Active'}</span>
       </div>
     ));
 
