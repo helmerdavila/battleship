@@ -157,9 +157,17 @@ export default class Board extends React.Component {
   handleChooseCell = (row, column) => {
     const board = this.state.board;
     const stateShips = this.state.ships;
+    let turn = this.state.currentTurns;
+    let matchLost = this.state.showLostMessage;
+    let matchWon = this.state.showWonMessage;
     const cell = board[row][column];
 
-    cell['landed'] = cell['ship'] !== null;
+    if (cell['landed'] === null) {
+      cell['landed'] = cell['ship'] !== null;
+      turn--;
+      matchLost = turn === 0;
+    }
+
     if (cell['ship']) {
       const ship = cell['ship'];
       cell['cssClass'] = 'the-column ship-touched';
@@ -192,7 +200,16 @@ export default class Board extends React.Component {
     }
 
     board[row][column] = {...cell};
-    this.setState({ board, ships: stateShips });
+
+    matchWon = stateShips.filter(ship => ship['sunk']).length === stateShips.length;
+
+    this.setState({
+      board,
+      ships: stateShips,
+      showWonMessage: matchWon,
+      showLostMessage: matchLost,
+      currentTurns: turn,
+    });
   };
 
   render() {
@@ -210,14 +227,19 @@ export default class Board extends React.Component {
         }
 
         const cell = board[indexRow][indexColumn];
-
-        columns.push(
+        const cellHtml = this.state.showLostMessage || this.state.showWonMessage ? (
+            <div key={`${indexRow}${indexColumn}`} className={cell['cssClass']}>
+              {`${indexRow}${indexColumn}`}
+            </div>
+          ) : (
           <div key={`${indexRow}${indexColumn}`}
                onClick={() => this.handleChooseCell(indexRow, indexColumn)}
                className={cell['cssClass']}>
             {`${indexRow}${indexColumn}`}
           </div>
         );
+
+        columns.push(cellHtml);
       }
       table.push(
         <div key={indexRow} className="the-row">
