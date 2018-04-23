@@ -2,7 +2,7 @@ import React from "react";
 
 const Modal = props => {
   return (
-    <div className={`modal ${props.showModal ? 'is-active' : null}`}>
+    <div className={`modal ${props.showModal ? 'is-active' : ''}`}>
       <div className="modal-background"/>
       <div className="modal-card">
         <div className="modal-card-head">

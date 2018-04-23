@@ -32,3 +32,23 @@
     }
   }
 }
+
+.game-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .message {
+    width: 60%;
+  }
+
+  .panel {
+    width: 60%;
+
+    .panel-block {
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+    }
+  }
+}

@@ -178,7 +178,7 @@ export default class Board extends React.Component {
         const touchedParts = ship['parts'].filter(part => part['touched']);
         if (touchedParts.length === ship['parts'].length) {
           ship['sunk'] = true;
-          ship['parts'].map(part => {
+          ship['parts'].forEach(part => {
             const cellOfPart = board[part['row']][part['column']];
             cellOfPart['cssClass'] = 'the-column ship-shunked';
           });
@@ -224,13 +224,26 @@ export default class Board extends React.Component {
       );
     }
 
+    const ships = this.state.ships.map(ship => (
+      <div key={ship['name']} className="panel-block">
+        <span className="is">{ship['name']}</span>
+        <span className={`tag ${ship['sunk'] ? 'is-danger' : 'is-success'}`}>{ship['sunk'] ? 'Shunk' : 'Active'}</span>
+      </div>
+    ));
+
     return (
       <Fragment>
         <Modal showModal={this.state.showTurnModal} difficulty={this.state.selectedDifficulty} changeDifficulty={this.handleChooseDifficulty}/>
         <div className="columns is-gapless">
           <div className="column is-one-third">
-            <section className="hero is-dark is-fullheight">
-              <h1>lol</h1>
+            <section className="hero game-data is-dark is-fullheight">
+              <div className="message is-success">
+                <div className="message-body is-uppercase">You win</div>
+              </div>
+              <div className="panel">
+                <p className="panel-heading">Ships</p>
+                {ships}
+              </div>
             </section>
           </div>
           <div className="column">
@@ -241,7 +254,7 @@ export default class Board extends React.Component {
               <div className="hero-foot">
                 <div className="tabs is-fullwidth">
                   <ul>
-                    <li><a>Turns: {this.state.currentTurns}</a></li>
+                    <li><a>Turns: {this.state.currentTurns > 1000 ? 'Infinite' : this.state.currentTurns}</a></li>
                   </ul>
                 </div>
               </div>

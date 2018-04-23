@@ -19,3 +19,16 @@
         background-color: #00d1b2; }
       .the-table .the-row .the-column.ship-untouched {
         background-color: #ff3860; }
+
+.game-data {
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+  .game-data .message {
+    width: 60%; }
+  .game-data .panel {
+    width: 60%; }
+    .game-data .panel .panel-block {
+      display: flex;
+      justify-content: space-between;
+      background-color: white; }
