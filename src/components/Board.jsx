@@ -35,6 +35,7 @@ export default class Board extends React.Component {
           column,
           ship: null,
           landed: null,
+          cssClass: 'the-column',
         };
       }
     }
@@ -158,17 +159,33 @@ export default class Board extends React.Component {
     cell['landed'] = cell['ship'] !== null;
     if (cell['ship']) {
       const ship = cell['ship'];
-      stateShips
-        .filter(stateShip => stateShip['name'] === ship['name'])
-        .map(ship => {
-          ship['parts']
-            .filter(part => part['row'] === cell['row'] && part['column'] === cell['column'])
-            .map(part => {
-              part['touched'] = true;
-              return part;
-            });
-          return ship;
-        });
+      cell['cssClass'] = 'the-column ship-touched';
+      // Changed the part to touched state
+      stateShips.filter(stateShip => stateShip['name'] === ship['name']).map(ship => {
+        ship['parts']
+          .filter(part => {
+            return part['row'] === cell['row'] && part['column'] === cell['column'];
+          })
+          .map(part => {
+            part['touched'] = true;
+            return part;
+          });
+        return ship;
+      });
+      // Check if the ship is shunk
+      stateShips.map(ship => {
+        const touchedParts = ship['parts'].filter(part => part['touched']);
+        if (touchedParts.length === ship['parts'].length) {
+          ship['sunk'] = true;
+          ship['parts'].map(part => {
+            const cellOfPart = board[part['row']][part['column']];
+            cellOfPart['cssClass'] = 'the-column ship-shunked';
+          });
+        }
+        return ship;
+      });
+    } else {
+      cell['cssClass'] = 'the-column ship-untouched';
     }
 
     board[row][column] = {...cell};
@@ -190,18 +207,11 @@ export default class Board extends React.Component {
         }
 
         const cell = board[indexRow][indexColumn];
-        let cellClass = 'the-column';
-
-        if (cell['landed']) {
-          cellClass = 'the-column ship-touched';
-        } else if (cell['landed'] === false) {
-          cellClass = 'the-column ship-untouched';
-        }
 
         columns.push(
           <div key={`${indexRow}${indexColumn}`}
                onClick={() => this.handleChooseCell(indexRow, indexColumn)}
-               className={cellClass}>
+               className={cell['cssClass']}>
             {`${indexRow}${indexColumn}`}
           </div>
         );

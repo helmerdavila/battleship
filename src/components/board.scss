@@ -18,6 +18,10 @@
       border: 1px solid black;
       cursor: pointer;
 
+      &.ship-shunked {
+        background-color: $yellow;
+      }
+
       &.ship-touched {
         background-color: $green;
       }

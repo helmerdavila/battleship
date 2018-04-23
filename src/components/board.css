@@ -13,6 +13,8 @@
       color: black;
       border: 1px solid black;
       cursor: pointer; }
+      .the-table .the-row .the-column.ship-shunked {
+        background-color: #ffdd57; }
       .the-table .the-row .the-column.ship-touched {
         background-color: #00d1b2; }
       .the-table .the-row .the-column.ship-untouched {
