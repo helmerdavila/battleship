@@ -9,7 +9,7 @@ export default class Board extends React.Component {
     rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
     columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     board: {},
-    ships: {},
+    ships: [],
     // turns
     currentTurns: 0,
     difficulty: {
@@ -46,12 +46,12 @@ export default class Board extends React.Component {
      * Ships: 3, Size: 2
      * Ships: 4, Size: 1
      */
-    this.createShips(4, 1, "#2427CC");
-    this.createShips(3, 2, "#7C2738");
-    this.createShips(2, 3, "#B8962E");
-    this.createShips(1, 4, "#B8512E");
+    const sizeOneShips = this.createShips(4, 1, "#2427CC");
+    const sizeTwoShips = this.createShips(3, 2, "#7C2738");
+    const sizeThreeShips = this.createShips(2, 3, "#B8962E");
+    const sizeFourShips = this.createShips(1, 4, "#B8512E");
 
-    return this.setState({ board: board });
+    return this.setState({ board: board, ships: [...sizeOneShips, ...sizeTwoShips, ...sizeThreeShips, ...sizeFourShips] });
   };
 
   getCell = (row, column) => this.board[row][column];
@@ -109,25 +109,32 @@ export default class Board extends React.Component {
     const ships = [];
 
     for (let temp = 1; temp <= quantity; temp++) {
-      const ship = [];
+      const parts = [];
       const shipName = `${faker.random.word()}-${size}`;
       const emptyCells = this.getEmptyCells(size);
 
       emptyCells.map(cell => {
         const part = {
-          shipName,
+          name: shipName,
           row: cell["row"],
           column: cell["column"],
           color,
+          touched: false,
         };
 
-        ship.push(part);
+        parts.push(part);
 
         return this.setShipPartInBoard(part, cell["row"], cell["column"]);
       });
 
-      ships[shipName] = ship;
+      ships.push({
+        name: shipName,
+        parts,
+        sunk: false,
+      });
     }
+
+    return ships;
   };
 
   initGame = () => {
@@ -145,10 +152,27 @@ export default class Board extends React.Component {
 
   handleChooseCell = (row, column) => {
     const board = this.state.board;
+    const stateShips = this.state.ships;
     const cell = board[row][column];
+
     cell['landed'] = cell['ship'] !== null;
+    if (cell['ship']) {
+      const ship = cell['ship'];
+      stateShips
+        .filter(stateShip => stateShip['name'] === ship['name'])
+        .map(ship => {
+          ship['parts']
+            .filter(part => part['row'] === cell['row'] && part['column'] === cell['column'])
+            .map(part => {
+              part['touched'] = true;
+              return part;
+            });
+          return ship;
+        });
+    }
+
     board[row][column] = {...cell};
-    this.setState({ board });
+    this.setState({ board, ships: stateShips });
   };
 
   render() {
