@@ -20,6 +20,8 @@ export default class Board extends React.Component {
     },
     selectedDifficulty: null,
     showTurnModal: true,
+    showWonMessage: false,
+    showLostMessage: false,
   };
 
   initBoard = () => {
@@ -231,15 +233,28 @@ export default class Board extends React.Component {
       </div>
     ));
 
+    let message = null;
+    if (this.state.showWonMessage) {
+      message = (
+        <div className="message is-success">
+          <div className="message-body is-uppercase">You win</div>
+        </div>
+      );
+    } else if (this.state.showLostMessage) {
+      message = (
+        <div className="message is-danger">
+          <div className="message-body is-uppercase">You lost</div>
+        </div>
+      );
+    }
+
     return (
       <Fragment>
         <Modal showModal={this.state.showTurnModal} difficulty={this.state.selectedDifficulty} changeDifficulty={this.handleChooseDifficulty}/>
         <div className="columns is-gapless">
           <div className="column is-one-third">
             <section className="hero game-data is-dark is-fullheight">
-              <div className="message is-success">
-                <div className="message-body is-uppercase">You win</div>
-              </div>
+              {message}
               <div className="panel">
                 <p className="panel-heading">Ships</p>
                 {ships}
